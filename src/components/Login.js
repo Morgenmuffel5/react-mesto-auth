@@ -30,7 +30,7 @@ function Login (props) {
         <>
             <Header
                 title="Регистрация"
-                link="/sign-up"/>
+                linkRoute="/sign-up"/>
             <div className="login">
                 <p className="login__title">
                     Вход

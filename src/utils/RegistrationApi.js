@@ -13,21 +13,18 @@ export class RegistrationApi {
         return Promise.reject(new Error(res.status))
     }
 
-    registrateNewUser(password, email) {
-        return fetch(`${this._baseURL}/signin`, {
+    registrateNewUser({password, email}) {
+        return fetch(`${this._baseURL}/signup`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                password: password,
-                email: email
-            })
+            body: JSON.stringify({password, email})
         }).then(this._checkResponse)
     }
 
     logInCurrentUser({password, email}) {
-        return fetch(`${this._baseURL}/signup`, {
+        return fetch(`${this._baseURL}/signin`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
@@ -51,4 +48,4 @@ export class RegistrationApi {
     }
 }
 
-export const registerApi = new RegistrationApi('https://auth.nomoreparties.co/');
+export const registerApi = new RegistrationApi('https://auth.nomoreparties.co');

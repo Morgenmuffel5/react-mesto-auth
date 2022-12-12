@@ -3,32 +3,38 @@ import { Link } from 'react-router-dom'
 import Header from "./Header";
 
 function Register (props) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
-    function handleEmailUpdate(e) {
-        setEmail(e.target.value)
+
+    const [formInputs, setFormInputs] = React.useState({
+        email: '',
+        password: '',
+    })
+
+
+    function handleUpdate (e) {
+        const { name, value } = e.target
+        setFormInputs((prevState) => ({ ...prevState, [name]: value }))
     }
-    function handlePasswordUpdate(e) {
-        setPassword(e.target.value)
+
+    function createNewAccount(e) {
+        e.preventDefault();
+        props.onRegister(formInputs);
     }
-    function createNewAccount() {
-        props.onRegister(password, email);
-    }
+
     return (
         <>
             <Header
                 title="Вход"
-                link="/sign-in"/>
+                linkRoute="/sign-in"/>
             <div className="login">
                 <p className="login__title">
                     Регистрация
                 </p>
                 <form className="login__form" onSubmit={createNewAccount}>
-                    <input placeholder='Email' required id="input-email" className='login__input' name="email" type="text" value={email ||''} onChange={handleEmailUpdate} />
-                    <input placeholder='Пароль' required id="input-password" name="password" className='login__input' type="password" value={password || ''} onChange={handlePasswordUpdate} />
+                    <input placeholder='Email' required id="input-email" className='login__input' name="email" type="text" value={formInputs.email ||''} onChange={handleUpdate} />
+                    <input placeholder='Пароль' required id="input-password" name="password" className='login__input' type="password" value={formInputs.password || ''} onChange={handleUpdate} />
                     <div className="login__button-cont">
-                        <button type="submit" className="login__button">Войти</button>
+                        <button type="submit" className="login__button">Зарегистрироваться</button>
                     </div>
                 </form>
                 <div className="login__cont">

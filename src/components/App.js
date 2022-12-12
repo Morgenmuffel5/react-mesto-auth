@@ -120,6 +120,7 @@ function App() {
         setSelectedCard({});
         setDeletedId('');
         setIsDeleterOpen(false);
+       setIsInfoTooltipPopupOpen(false);
     }
 
     function handleCardClick(card) {
@@ -133,8 +134,8 @@ function App() {
     }
 
     //функция регистрации
-    function handleCreateAccount(password, email) {
-        registerApi.registrateNewUser(password, email).then(response => {
+    function handleCreateAccount(userInfo) {
+        registerApi.registrateNewUser(userInfo).then(response => {
             history.push('/sign-in')
             setIsOk(true);
             handleOpenLoginPopup();
@@ -167,6 +168,7 @@ function App() {
     React.useEffect(() => {
         if (localStorage.getItem('token')) {
             const token = localStorage.getItem('token')
+            console.log(token)
             registerApi.checkToken(token).then((response) => {
                     setUserEmail(response.data.email)
                     setLoggedIn(true)
@@ -175,21 +177,20 @@ function App() {
                     console.log(err)
                 })
         }
-    })
+    }, [])
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
                 <div className="page__content">
                     <Switch>
-                        <Login/>
-                        <ProtectedRoute component={() => (
+                        <ProtectedRoute path="/" exact component={() => (
                             <>
                                 <Header
                                     title="Выйти"
                                     userEmail={userEmail}
                                     signOut={handleLogout}
-                                    link="/sign-up"
+                                    linkRoute="/sign-in"
                                 />
                                 <Main
                                     onEditAvatar={handleEditAvatarClick}
@@ -200,6 +201,7 @@ function App() {
                                     onCardDelete={handleCardDelete}
                                     onCardLike={handleCardLike}
                                 />
+                                <Footer/>
                             </>
                         )}
                                         loggedIn={loggedIn}/>
@@ -211,11 +213,8 @@ function App() {
                         <Route  path="/sign-in">
                                     <Login onLogin={handleLogin}/>
                         </Route>
-                        <Route>
-                            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-                        </Route>
                     </Switch>
-                    <Footer/>
+
 
                     <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups}
                                       onUpdateUser={handleUpdateUser}/>

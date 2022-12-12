@@ -9,7 +9,7 @@ function Header (props) {
         <header className="header">
             <a href="src/components/App#" className="header__logo"></a>
             <p className="header__email">{props.userEmail}</p>
-            <Link to={props.link} className="header__title" onClick={props.signOut}>
+            <Link to={props.linkRoute} className="header__link" onClick={props.signOut}>
                 {props.title}
             </Link>
         </header>
