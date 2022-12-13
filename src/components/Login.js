@@ -22,15 +22,14 @@ function Login (props) {
             password: password,
             email: email
         });
-        setEmail('');
-        setPassword('');
     }
+
+    React.useEffect(() => {
+        props.onUpdateHeader(false);
+    }, []);
 
     return (
         <>
-            <Header
-                title="Регистрация"
-                linkRoute="/sign-up"/>
             <div className="login">
                 <p className="login__title">
                     Вход

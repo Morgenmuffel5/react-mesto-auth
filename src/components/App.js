@@ -15,9 +15,10 @@ import ProtectedRoute from "./ProtectedRoute";
 import Register from "./Register";
 import InfoTooltip from "./InfoTooltip";
 import {api} from '../utils/Api.js'
-import {registerApi} from "../utils/RegistrationApi";
+import {registerApi} from "../utils/AuthApi";
 import {CurrentUserContext} from '../contexts/CurrentUserContext.js'
 import {Route, Switch, useHistory, Redirect} from 'react-router-dom'
+import PageNotFound from "./PageNotFound";
 
 function App() {
 
@@ -32,19 +33,26 @@ function App() {
     const [cards, setCards] = React.useState([]);
     const [loggedIn, setLoggedIn] = React.useState(false);
     const [userEmail, setUserEmail] = React.useState('');
-    const [isOk, setIsOk] = React.useState(false);
+    const [isSuccessTooltipStatus, setIsSuccessTooltipStatus] = React.useState(false);
+    const [isRegistration, setIsRegistration] = React.useState(false);
     const history = useHistory()
 
     React.useEffect(() => {
-        Promise.all([api.getUserInfo(), api.getInitialCards()])
-            .then(([userData, cards]) => {
-                setCurrentUser(userData);
-                setCards(cards);
-            })
-            .catch(err => {
-                console.log(err)
-            });
-    }, []);
+        if (loggedIn === true) {
+            Promise.all([api.getUserInfo(), api.getInitialCards()])
+                .then(([userData, cards]) => {
+                    setCurrentUser(userData);
+                    setCards(cards);
+                })
+                .catch(err => {
+                    console.log(err)
+                });
+        }
+    }, [loggedIn]);
+
+    function handleUpdateRegistration (val) {
+        setIsRegistration(val);
+    }
 
     function handleCardLike(card) {
         const isLiked = card.likes.some(i => i._id === currentUser._id);
@@ -65,8 +73,8 @@ function App() {
     }
 
     function handleUpdateUser(userInfo) {
-        api.saveNewUserInfo(userInfo).then((response) => {
-            setCurrentUser(response);
+        api.saveNewUserInfo(userInfo).then((userData) => {
+            setCurrentUser(userData);
             closeAllPopups()
         }).catch(err => {
             console.log(err)
@@ -74,8 +82,8 @@ function App() {
     }
 
     function handleUpdateAvatar(userInfo) {
-        api.changeAvatar(userInfo).then((response) => {
-            setCurrentUser(currentUser.avatar = response);
+        api.changeAvatar(userInfo).then((avatar) => {
+            setCurrentUser(currentUser.avatar = avatar);
             closeAllPopups()
         }).catch(err => {
             console.log(err)
@@ -83,8 +91,8 @@ function App() {
     }
 
     function handleUpdateCard(cardInfo) {
-        api.addNewCard(cardInfo).then((response) => {
-            setCards([response, ...cards]);
+        api.addNewCard(cardInfo).then((cardList) => {
+            setCards([cardList, ...cards]);
             closeAllPopups()
         }).catch(err => {
             console.log(err)
@@ -137,11 +145,11 @@ function App() {
     function handleCreateAccount(userInfo) {
         registerApi.registrateNewUser(userInfo).then(response => {
             history.push('/sign-in')
-            setIsOk(true);
+            setIsSuccessTooltipStatus(true);
             handleOpenLoginPopup();
         }).catch(error => {
             console.log(error);
-            setIsOk(false);
+            setIsSuccessTooltipStatus(false);
             handleOpenLoginPopup();
         })
     }
@@ -154,44 +162,39 @@ function App() {
                 setLoggedIn(true);
                 history.push('/')
             } else {
-                setIsOk(false);
+                setIsSuccessTooltipStatus(false);
                 handleOpenLoginPopup();
             }
         }).catch(error => {
             console.log(error);
-            setIsOk(false);
+            setIsSuccessTooltipStatus(false);
             handleOpenLoginPopup();
         })
     }
 
 
     React.useEffect(() => {
+        const token = localStorage.getItem('token')
         if (localStorage.getItem('token')) {
-            const token = localStorage.getItem('token')
-            console.log(token)
-            registerApi.checkToken(token).then((response) => {
-                    setUserEmail(response.data.email)
-                    setLoggedIn(true)
+            registerApi.checkToken(token).then((userData) => {
+                    setUserEmail(userData.data.email)
+                    setLoggedIn(true);
+                history.push('/')
                 })
                 .catch((err) => {
                     console.log(err)
                 })
         }
-    }, [])
+    }, []);
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
                 <div className="page__content">
+                    <Header loggedIn={loggedIn} signOut={handleLogout} userEmail={userEmail} isRegistration={isRegistration}/>
                     <Switch>
                         <ProtectedRoute path="/" exact component={() => (
                             <>
-                                <Header
-                                    title="Выйти"
-                                    userEmail={userEmail}
-                                    signOut={handleLogout}
-                                    linkRoute="/sign-in"
-                                />
                                 <Main
                                     onEditAvatar={handleEditAvatarClick}
                                     onEditProfile={handleEditProfileClick}
@@ -207,11 +210,14 @@ function App() {
                                         loggedIn={loggedIn}/>
 
                         <Route path="/sign-up">
-                                    <Register onRegister={handleCreateAccount}/>
+                                    <Register onRegister={handleCreateAccount} onUpdateHeader={handleUpdateRegistration}/>
                         </Route>
 
                         <Route  path="/sign-in">
-                                    <Login onLogin={handleLogin}/>
+                                    <Login onLogin={handleLogin} onUpdateHeader={handleUpdateRegistration}/>
+                        </Route>
+                        <Route path="*">
+                            <PageNotFound />
                         </Route>
                     </Switch>
 
@@ -232,7 +238,7 @@ function App() {
 
                     <ImagePopup card={selectedCard} onClose={closeAllPopups} name="image"/>
 
-                    <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} isOk={isOk}/>
+                    <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} isOk={isSuccessTooltipStatus}/>
 
                 </div>
             </div>

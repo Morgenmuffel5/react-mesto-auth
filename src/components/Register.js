@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Link } from 'react-router-dom'
 import Header from "./Header";
+import {registerApi} from "../utils/AuthApi";
 
 function Register (props) {
 
@@ -21,11 +22,13 @@ function Register (props) {
         props.onRegister(formInputs);
     }
 
+
+    React.useEffect(() => {
+        props.onUpdateHeader(true);
+    }, []);
+
     return (
         <>
-            <Header
-                title="Вход"
-                linkRoute="/sign-in"/>
             <div className="login">
                 <p className="login__title">
                     Регистрация

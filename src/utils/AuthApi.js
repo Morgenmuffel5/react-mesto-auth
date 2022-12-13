@@ -1,5 +1,5 @@
 
-export class RegistrationApi {
+export class AuthApi {
 
     constructor(baseUrl) {
         this._baseURL = baseUrl;
@@ -48,4 +48,4 @@ export class RegistrationApi {
     }
 }
 
-export const registerApi = new RegistrationApi('https://auth.nomoreparties.co');
+export const registerApi = new AuthApi('https://auth.nomoreparties.co');
