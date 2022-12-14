@@ -4,7 +4,7 @@ import {CurrentUserContext} from "../contexts/CurrentUserContext";
 import {api} from "../utils/Api";
 
 
-function EditAvatarPopup (props) {
+function EditAvatarPopup(props) {
 
 
     const avatarRef = React.useRef('');
@@ -20,12 +20,12 @@ function EditAvatarPopup (props) {
         });
     }
 
-    return(
+    return (
         <PopupWithForm name='avatar' title='Обновить аватар'
                        children={
                            <>
                                <label className="popup__fieldset">
-                                   <input ref={avatarRef}  id="popup__input-avatar" type="url"
+                                   <input ref={avatarRef} id="popup__input-avatar" type="url"
                                           className="popup__input popup__input_value_avatar"
                                           name="avatar" placeholder="Ссылка" required /*noValidate*/ />
 

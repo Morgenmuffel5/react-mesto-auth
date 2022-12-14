@@ -1,7 +1,5 @@
-import React, {useState} from "react";
-import { Link } from 'react-router-dom'
-import Header from "./Header";
-import {registerApi} from "../utils/AuthApi";
+import React from "react";
+import {Link} from 'react-router-dom'
 
 function Register (props) {
 
